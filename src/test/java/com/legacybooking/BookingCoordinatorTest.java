@@ -45,10 +45,9 @@ public class BookingCoordinatorTest {
             String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).toString();
 
-            // Add final result to spec book
             specBook.append("🔹 Final Result: ").append(result).append("\n");
 
-            // Assert - verify all interactions were logged
+            // Assert
             Approvals.verify(specBook.toString());
         } finally {
             // Clean up factory
