@@ -3,6 +3,7 @@ package com.legacybooking;
 import link.specrec.ObjectFactory;
 import link.specrec.IConstructorCalledWith;
 import link.specrec.ConstructorParameterInfo;
+import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
@@ -27,6 +28,9 @@ public class BookingCoordinatorTest {
         String specialRequests = "meal,wheelchair";
         LocalDateTime bookingDate = LocalDateTime.of(2025, 3, 4, 14, 0, 56);
 
+        // Setup CallLogger with shared spec book
+        StringBuilder specBook = new StringBuilder();
+
         // Setup stubs using SpecRec ObjectFactory
         ObjectFactory factory = ObjectFactory.getInstance();
         factory.setOne(BookingRepository.class, new BookingRepositoryStub());
@@ -41,11 +45,11 @@ public class BookingCoordinatorTest {
             String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).toString();
 
-            // Print result for verification
-            System.out.println("Returns: \"" + result + "\"");
+            // Add final result to spec book
+            specBook.append("🔹 Final Result: ").append(result).append("\n");
 
-            // Basic assertion to ensure test passes
-            Assertions.assertTrue(result.contains("APPLE3.14"));
+            // Assert - verify all interactions were logged
+            Approvals.verify(specBook.toString());
         } finally {
             // Clean up factory
             factory.clearAll();
