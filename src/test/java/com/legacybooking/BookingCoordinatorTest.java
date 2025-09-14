@@ -17,11 +17,16 @@ public class BookingCoordinatorTest {
         String airlineCode = "AA";
         String specialRequests = "meal,wheelchair";
 
-        // Act & Assert
+        StringBuilder specBook = new StringBuilder();
+
+        // Act
         BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl();
         String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
-                passengerCount, airlineCode, specialRequests).toString();
+                passengerCount, airlineCode, specialRequests);
 
-        Approvals.verify(result);
+        specBook.append("🔹 Final Result: ").append(result.toString()).append("\n");
+
+        // Assert
+        Approvals.verify(specBook.toString());
     }
 }
