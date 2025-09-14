@@ -38,10 +38,10 @@ public class BookingCoordinatorTest {
         try {
             // Act
             BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl(bookingDate);
-            String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests).toString();
+            Booking result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests);
 
-            specBook.append("🔹 Final Result: ").append(result).append("\n");
+            specBook.append("🔹 Final Result: ").append(result.toString()).append("\n");
 
             // Assert
             Approvals.verify(specBook.toString());
