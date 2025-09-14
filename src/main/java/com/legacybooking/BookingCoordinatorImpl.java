@@ -30,7 +30,6 @@
 
 package com.legacybooking;
 
-import link.specrec.ObjectFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
@@ -39,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static link.specrec.GlobalObjectFactory.*;
 
 /**
  * Main coordinator for flight booking operations
@@ -79,7 +80,7 @@ public class BookingCoordinatorImpl {
         int maxRetries = calculateRetriesBasedOnBookingCount(); // Dynamic retry calculation
 
         // Create repository with calculated parameters
-        BookingRepository repository = ObjectFactory.getInstance().create(BookingRepository.class, BookingRepositoryImpl.class).with(connectionString, maxRetries);
+        BookingRepository repository = create(BookingRepository.class, BookingRepositoryImpl.class).with(connectionString, maxRetries);
 
         // Calculate pricing engine parameters based on current state
         BigDecimal taxRate = calculateTaxRateBasedOnGlobalState(airlineCode);
@@ -91,7 +92,7 @@ public class BookingCoordinatorImpl {
         PricingEngine pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage, _bookingDate);
 
         String availabilityConnectionString = modifyConnectionStringForAvailability(connectionString, flightNumber);
-        FlightAvailabilityService availabilityService = ObjectFactory.getInstance().create(FlightAvailabilityService.class, FlightAvailabilityServiceImpl.class).with(availabilityConnectionString);
+        FlightAvailabilityService availabilityService = create(FlightAvailabilityService.class, FlightAvailabilityServiceImpl.class).with(availabilityConnectionString);
 
         List<String> availableSeats = availabilityService.checkAndGetAvailableSeatsForBooking(flightNumber, departureDate, passengerCount);
         if (availableSeats.size() < passengerCount) {
@@ -119,12 +120,12 @@ public class BookingCoordinatorImpl {
         // Configure partner notification settings
         String smtpServer = determineSmtpServerFromAirlineCode(airlineCode);
         boolean useEncryption = bookingCounter % 2 == 0; // Alternate encryption for load balancing
-        PartnerNotifier partnerNotifier = ObjectFactory.getInstance().create(PartnerNotifier.class, PartnerNotifierImpl.class).with(smtpServer, useEncryption);
+        PartnerNotifier partnerNotifier = create(PartnerNotifier.class, PartnerNotifierImpl.class).with(smtpServer, useEncryption);
 
         // Setup audit logging with dynamic configuration
         String logDirectory = calculateLogDirectoryFromBookingCount();
         boolean verboseMode = temporaryData.containsKey("debugMode"); // Enable verbose mode if debug flag set
-        AuditLogger auditLogger = ObjectFactory.getInstance().create(AuditLogger.class, AuditLoggerImpl.class).with(logDirectory, verboseMode);
+        AuditLogger auditLogger = create(AuditLogger.class, AuditLoggerImpl.class).with(logDirectory, verboseMode);
 
         // Generate unique booking reference
         String bookingReference = generateBookingReferenceAndUpdateCounters(passengerName, flightNumber);

@@ -1,6 +1,5 @@
 package com.legacybooking;
 
-import link.specrec.ObjectFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -8,6 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static link.specrec.GlobalObjectFactory.*;
 
 /**
  * Handles all pricing calculations for flight bookings
@@ -105,7 +106,7 @@ public class PricingEngine {
 
         // Apply random promotional discounts to test the market
         // TODO: Replace this with proper discount service integration
-        int random = ObjectFactory.getInstance().create(Random.class).with().nextInt(5);
+        int random = create(Random.class).with().nextInt(5);
         if (random == 1) {
             discountAmount[0] = new BigDecimal("25.0"); // Premium discount
         } else if (random == 3) {
