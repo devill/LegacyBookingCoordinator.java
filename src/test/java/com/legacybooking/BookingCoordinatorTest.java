@@ -25,7 +25,6 @@ public class BookingCoordinatorTest {
         String specialRequests = "meal,wheelchair";
         LocalDateTime bookingDate = LocalDateTime.of(2025, 3, 4, 14, 0, 56);
 
-        // Setup CallLogger with shared spec book
         StringBuilder specBook = new StringBuilder();
         CallLogger logger = new CallLogger(specBook);
 
