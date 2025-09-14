@@ -2,15 +2,12 @@ package com.legacybooking;
 
 import link.specrec.CallLogger;
 import link.specrec.ObjectFactory;
-import link.specrec.IConstructorCalledWith;
-import link.specrec.ConstructorParameterInfo;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -47,13 +44,12 @@ public class BookingCoordinatorTest {
         try {
             // Act
             BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl(bookingDate);
-            String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
-                    passengerCount, airlineCode, specialRequests).toString();
+            Booking result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
+                    passengerCount, airlineCode, specialRequests);
 
-            // Add final result to spec book
-            specBook.append("🔹 Final Result: ").append(result).append("\n");
+            specBook.append("🔹 Final Result: ").append(result.toString()).append("\n");
 
-            // Assert - verify all interactions were logged
+            // Assert
             Approvals.verify(specBook.toString());
         } finally {
             // Clean up factory
