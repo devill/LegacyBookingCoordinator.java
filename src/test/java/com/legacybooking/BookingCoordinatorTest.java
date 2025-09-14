@@ -40,7 +40,7 @@ public class BookingCoordinatorTest {
         factory.setOne(Random.class, new RandomStub());
 
         try {
-            // Act & Assert
+            // Act
             BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl(bookingDate);
             String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).toString();
