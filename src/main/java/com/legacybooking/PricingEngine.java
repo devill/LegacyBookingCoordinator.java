@@ -1,5 +1,6 @@
 package com.legacybooking;
 
+import link.specrec.ObjectFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -7,6 +8,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static link.specrec.ObjectFactory.getInstance;
 
 /**
  * Handles all pricing calculations for flight bookings
@@ -19,19 +22,21 @@ public class PricingEngine {
     private final boolean enableDynamicPricing; // Enable/disable dynamic pricing features
     private final String currencyCode; // Currency code for this pricing instance
     private final BigDecimal historicalData; // Historical pricing data for calculations
+    private final LocalDateTime _bookingDate;
 
     /**
      * Initialize pricing engine with configuration
      * NOTE: Constructor parameters must match the database schema exactly
      */
     public PricingEngine(BigDecimal taxRate, Map<String, BigDecimal> airlineFees,
-                        boolean applyRandomSurcharges, String regionCode, BigDecimal averageFlightCost) {
+                        boolean applyRandomSurcharges, String regionCode, BigDecimal averageFlightCost, LocalDateTime bookingDate) {
         // Initialize core pricing parameters
         this.baseMultiplier = taxRate;
         this.seasonalAdjustments = airlineFees != null ? airlineFees : new HashMap<>();
         this.enableDynamicPricing = applyRandomSurcharges;
         this.currencyCode = regionCode;
         this.historicalData = averageFlightCost;
+        this._bookingDate = bookingDate;
     }
 
     /**
@@ -63,7 +68,7 @@ public class PricingEngine {
      * Business rule: Early bookings get discount, last-minute bookings get surcharge
      */
     public BigDecimal calculateTimeBasedMarkup(LocalDateTime departureDate) {
-        long daysUntilFlight = ChronoUnit.DAYS.between(LocalDateTime.now(), departureDate);
+        long daysUntilFlight = ChronoUnit.DAYS.between(_bookingDate, departureDate);
 
         if (daysUntilFlight < 7) {
             return new BigDecimal("150.0"); // Last minute surcharge
@@ -102,7 +107,7 @@ public class PricingEngine {
 
         // Apply random promotional discounts to test the market
         // TODO: Replace this with proper discount service integration
-        int random = new Random().nextInt(5);
+        int random = getInstance().create(Random.class).with().nextInt(5);
         if (random == 1) {
             discountAmount[0] = new BigDecimal("25.0"); // Premium discount
         } else if (random == 3) {

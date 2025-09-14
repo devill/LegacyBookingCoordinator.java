@@ -30,6 +30,7 @@
 
 package com.legacybooking;
 
+import link.specrec.ObjectFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
@@ -37,6 +38,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import static link.specrec.ObjectFactory.getInstance;
 
 /**
  * Main coordinator for flight booking operations
@@ -44,11 +48,20 @@ import java.util.Map;
  * Last updated: 2018 (needs refactoring for new airline partnerships)
  */
 public class BookingCoordinatorImpl {
+    private final LocalDateTime _bookingDate;
     private String lastBookingRef; // Stores reference for debugging purposes
     private int bookingCounter = 1; // Global counter for booking sequence
     private boolean isProcessingBooking = false; // Thread safety flag (NOTE: not actually thread-safe)
 
     private Map<String, Object> temporaryData = new HashMap<>(); // Temporary storage for calculation intermediates
+
+    public BookingCoordinatorImpl(LocalDateTime bookingDate) {
+        _bookingDate = bookingDate;
+    }
+
+    public BookingCoordinatorImpl() {
+        _bookingDate = LocalDateTime.now();
+    }
 
     /**
      * Main entry point for flight booking process
@@ -68,7 +81,7 @@ public class BookingCoordinatorImpl {
         int maxRetries = calculateRetriesBasedOnBookingCount(); // Dynamic retry calculation
 
         // Create repository with calculated parameters
-        BookingRepository repository = new BookingRepositoryImpl(connectionString, maxRetries);
+        BookingRepository repository = getInstance().create(BookingRepository.class, BookingRepositoryImpl.class).with(connectionString, maxRetries);
 
         // Calculate pricing engine parameters based on current state
         BigDecimal taxRate = calculateTaxRateBasedOnGlobalState(airlineCode);
@@ -77,10 +90,10 @@ public class BookingCoordinatorImpl {
         String regionCode = determineRegionFromFlightNumber(flightNumber);
         BigDecimal historicalAverage = getHistoricalAverageFromRepository(repository, flightNumber);
 
-        PricingEngine pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage);
+        PricingEngine pricingEngine = new PricingEngine(taxRate, airlineFees, enableRandomSurcharges, regionCode, historicalAverage, _bookingDate);
 
         String availabilityConnectionString = modifyConnectionStringForAvailability(connectionString, flightNumber);
-        FlightAvailabilityService availabilityService = new FlightAvailabilityServiceImpl(availabilityConnectionString);
+        FlightAvailabilityService availabilityService = getInstance().create(FlightAvailabilityService.class, FlightAvailabilityServiceImpl.class).with(availabilityConnectionString);
 
         List<String> availableSeats = availabilityService.checkAndGetAvailableSeatsForBooking(flightNumber, departureDate, passengerCount);
         if (availableSeats.size() < passengerCount) {
@@ -108,12 +121,12 @@ public class BookingCoordinatorImpl {
         // Configure partner notification settings
         String smtpServer = determineSmtpServerFromAirlineCode(airlineCode);
         boolean useEncryption = bookingCounter % 2 == 0; // Alternate encryption for load balancing
-        PartnerNotifier partnerNotifier = new PartnerNotifierImpl(smtpServer, useEncryption);
+        PartnerNotifier partnerNotifier = getInstance().create(PartnerNotifier.class, PartnerNotifierImpl.class).with(smtpServer, useEncryption);
 
         // Setup audit logging with dynamic configuration
         String logDirectory = calculateLogDirectoryFromBookingCount();
         boolean verboseMode = temporaryData.containsKey("debugMode"); // Enable verbose mode if debug flag set
-        AuditLogger auditLogger = new AuditLoggerImpl(logDirectory, verboseMode);
+        AuditLogger auditLogger = getInstance().create(AuditLogger.class, AuditLoggerImpl.class).with(logDirectory, verboseMode);
 
         // Generate unique booking reference
         String bookingReference = generateBookingReferenceAndUpdateCounters(passengerName, flightNumber);
@@ -122,7 +135,7 @@ public class BookingCoordinatorImpl {
         // Save booking details
         String actualBookingRef = repository.saveBookingDetails(passengerName,
                 String.format("%s on %s for %d passengers", flightNumber, departureDate.toLocalDate(), passengerCount),
-                finalPrice, LocalDateTime.now());
+                finalPrice, _bookingDate);
 
         // Log the booking activity
         auditLogger.logBookingActivity("Flight Booked", actualBookingRef,
@@ -148,11 +161,11 @@ public class BookingCoordinatorImpl {
         partnerNotifier.updatePartnerBookingStatus(airlineCode, actualBookingRef, bookingStatus);
 
         temporaryData.put("lastBookingPrice", finalPrice);
-        temporaryData.put("lastBookingDate", LocalDateTime.now());
+        temporaryData.put("lastBookingDate", _bookingDate);
         isProcessingBooking = false;
 
         return new Booking(actualBookingRef, passengerName, flightNumber, departureDate,
-                passengerCount, airlineCode, finalPrice, specialRequests, LocalDateTime.now(), bookingStatus);
+                passengerCount, airlineCode, finalPrice, specialRequests, _bookingDate, bookingStatus);
     }
 
     private int calculateRetriesBasedOnBookingCount() {
@@ -282,7 +295,7 @@ public class BookingCoordinatorImpl {
     }
 
     private String determineSmtpServerFromAirlineCode(String airlineCode) {
-        temporaryData.put("lastSmtpLookup", LocalDateTime.now());
+        temporaryData.put("lastSmtpLookup", _bookingDate);
 
         switch (airlineCode) {
             case "AA":

@@ -21,9 +21,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.approvaltests</groupId>
+            <groupId>link.specrec</groupId>
+            <artifactId>specrec</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.approvaltests</groupId>
             <artifactId>approvaltests</artifactId>
-            <version>22.3.3</version>
+            <version>24.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
