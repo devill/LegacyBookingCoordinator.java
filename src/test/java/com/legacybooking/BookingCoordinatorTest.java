@@ -21,7 +21,7 @@ public class BookingCoordinatorTest {
 
         // Act
         BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl();
-        String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
+        Booking result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
                 passengerCount, airlineCode, specialRequests);
 
         specBook.append("🔹 Final Result: ").append(result.toString()).append("\n");
