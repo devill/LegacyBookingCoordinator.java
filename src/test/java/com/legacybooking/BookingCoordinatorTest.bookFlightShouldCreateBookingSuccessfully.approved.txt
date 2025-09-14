@@ -1,0 +1,71 @@
+💾 BookingRepository constructor called with:
+  🔸 arg0: Server=production-db;Database=FlightBookings;Trusted_Connection=true;
+  🔸 arg1: 1
+
+✈️ FlightAvailabilityService constructor called with:
+  🔸 arg0: Server=production-db;Database=FlightAvailability_AA;Trusted_Connection=true;
+
+✈️ checkAndGetAvailableSeatsForBooking:
+  🔸 arg0: AA123
+  🔸 arg1: 2025-07-03T12:42:11
+  🔸 arg2: 2
+  🔹 Returns: 11A,11B
+
+🎲 nextInt:
+  🔸 bound: 5
+  🔹 Returns: 3
+
+📣 PartnerNotifier constructor called with:
+  🔸 arg0: smtp.american.com
+  🔸 arg1: true
+
+🪵 AuditLogger constructor called with:
+  🔸 arg0: /var/logs/BookingLogs/LowVolume
+  🔸 arg1: false
+
+💾 saveBookingDetails:
+  🔸 arg0: John Doe
+  🔸 arg1: AA123 on 2025-07-03 for 2 passengers
+  🔸 arg2: 1545.1551600
+  🔸 arg3: 2025-03-04T14:00:56
+  🔹 Returns: APPLE3.14
+
+🪵 logBookingActivity:
+  🔸 arg0: Flight Booked
+  🔸 arg1: APPLE3.14
+  🔸 arg2: Passenger: John Doe, Flight: AA123
+
+🪵 recordPricingCalculation:
+  🔸 arg0: Base: 1485.155160, Weekday: 1.0, Seasonal: 50.0, Special: 20.0, Discount: 10.0
+  🔸 arg1: 1545.1551600
+  🔸 arg2: AA123 on 2025-07-03
+
+📣 notifyPartnerAboutBooking:
+  🔸 arg0: AA
+  🔸 arg1: APPLE3.14
+  🔸 arg2: 1545.1551600
+  🔸 arg3: John Doe
+  🔸 arg4: AA123 departing 2025-07-03T12:42:11
+  🔸 arg5: false
+
+📣 validateAndNotifySpecialRequests:
+  🔸 arg0: AA
+  🔸 arg1: meal,wheelchair
+  🔸 arg2: APPLE3.14
+  🔹 Returns: true
+
+📣 updatePartnerBookingStatus:
+  🔸 arg0: AA
+  🔸 arg1: APPLE3.14
+  🔸 arg2: CONFIRMED_PREMIUM
+
+🔹 Final Result: New booking: APPLE3.14
+  👤 John Doe
+  ✈️ AA123
+  📅 2025-07-03 12:42
+  👥 2
+  🏢 AA
+  💰 $1545.16
+  🎯 meal,wheelchair
+  📝 2025-03-04 14:00
+  ✅ CONFIRMED_PREMIUM

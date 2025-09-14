@@ -1,10 +1,11 @@
 package com.legacybooking;
 
+import link.specrec.CallLogger;
 import link.specrec.ObjectFactory;
 import link.specrec.IConstructorCalledWith;
 import link.specrec.ConstructorParameterInfo;
+import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,25 +28,33 @@ public class BookingCoordinatorTest {
         String specialRequests = "meal,wheelchair";
         LocalDateTime bookingDate = LocalDateTime.of(2025, 3, 4, 14, 0, 56);
 
+        // Setup CallLogger with shared spec book
+        StringBuilder specBook = new StringBuilder();
+        CallLogger logger = new CallLogger(specBook);
+
         // Setup stubs using SpecRec ObjectFactory
         ObjectFactory factory = ObjectFactory.getInstance();
-        factory.setOne(BookingRepository.class, new BookingRepositoryStub());
-        factory.setOne(FlightAvailabilityService.class, new FlightAvailabilityServiceStub());
-        factory.setOne(PartnerNotifier.class, new PartnerNotifierStub());
-        factory.setOne(AuditLogger.class, new AuditLoggerStub());
-        factory.setOne(Random.class, new RandomStub());
+
+        // Wrap interface-based stubs with CallLogger to record interactions
+        factory.setOne(BookingRepository.class, logger.wrap(BookingRepository.class, new BookingRepositoryStub(), "💾"));
+        factory.setOne(FlightAvailabilityService.class, logger.wrap(FlightAvailabilityService.class, new FlightAvailabilityServiceStub(), "✈️"));
+        factory.setOne(PartnerNotifier.class, logger.wrap(PartnerNotifier.class, new PartnerNotifierStub(), "📣"));
+        factory.setOne(AuditLogger.class, logger.wrap(AuditLogger.class, new AuditLoggerStub(), "🪵"));
+
+        // Random is a concrete class, so wrap it differently using logging wrapper
+        factory.setOne(Random.class, new LoggingRandomWrapper(new RandomStub(), logger, "🎲"));
 
         try {
-            // Act & Assert
+            // Act
             BookingCoordinatorImpl coordinator = new BookingCoordinatorImpl(bookingDate);
             String result = coordinator.bookFlight(passengerName, flightNumber, departureDate,
                     passengerCount, airlineCode, specialRequests).toString();
 
-            // Print result for verification
-            System.out.println("Returns: \"" + result + "\"");
+            // Add final result to spec book
+            specBook.append("🔹 Final Result: ").append(result).append("\n");
 
-            // Basic assertion to ensure test passes
-            Assertions.assertTrue(result.contains("APPLE3.14"));
+            // Assert - verify all interactions were logged
+            Approvals.verify(specBook.toString());
         } finally {
             // Clean up factory
             factory.clearAll();
@@ -130,6 +139,29 @@ public class BookingCoordinatorTest {
         @Override
         public int nextInt(int bound) {
             return 3;
+        }
+    }
+
+    // Manual logging wrapper for Random (since it's a concrete class, not an interface)
+    public static class LoggingRandomWrapper extends Random {
+        private final Random target;
+        private final CallLogger logger;
+        private final String emoji;
+
+        public LoggingRandomWrapper(Random target, CallLogger logger, String emoji) {
+            this.target = target;
+            this.logger = logger;
+            this.emoji = emoji;
+        }
+
+        @Override
+        public int nextInt(int bound) {
+            int result = target.nextInt(bound);
+            // Manually add to specbook with emoji formatting
+            logger.getSpecBook().append(emoji).append(" nextInt:\n")
+                  .append("  🔸 bound: ").append(bound).append("\n")
+                  .append("  🔹 Returns: ").append(result).append("\n\n");
+            return result;
         }
     }
 }
