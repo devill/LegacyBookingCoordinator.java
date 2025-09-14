@@ -23,7 +23,7 @@
         <dependency>
             <groupId>link.specrec</groupId>
             <artifactId>specrec</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.approvaltests</groupId>
@@ -60,6 +60,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+                <configuration>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens jdk.unsupported/sun.misc=ALL-UNNAMED --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

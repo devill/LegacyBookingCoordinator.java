@@ -37,8 +37,7 @@ public class BookingCoordinatorTest {
         factory.setOne(PartnerNotifier.class, logger.wrap(PartnerNotifier.class, new PartnerNotifierStub(), "📣"));
         factory.setOne(AuditLogger.class, logger.wrap(AuditLogger.class, new AuditLoggerStub(), "🪵"));
 
-        // Random is a concrete class, so wrap it differently using logging wrapper
-        factory.setOne(Random.class, new LoggingRandomWrapper(new RandomStub(), logger, "🎲"));
+        factory.setOne(Random.class, logger.wrap(Random.class, new RandomStub(), "🎲"));
 
         try {
             // Act
@@ -137,26 +136,4 @@ public class BookingCoordinatorTest {
         }
     }
 
-    // Manual logging wrapper for Random (since it's a concrete class, not an interface)
-    public static class LoggingRandomWrapper extends Random {
-        private final Random target;
-        private final CallLogger logger;
-        private final String emoji;
-
-        public LoggingRandomWrapper(Random target, CallLogger logger, String emoji) {
-            this.target = target;
-            this.logger = logger;
-            this.emoji = emoji;
-        }
-
-        @Override
-        public int nextInt(int bound) {
-            int result = target.nextInt(bound);
-            // Manually add to specbook with emoji formatting
-            logger.getSpecBook().append(emoji).append(" nextInt:\n")
-                  .append("  🔸 bound: ").append(bound).append("\n")
-                  .append("  🔹 Returns: ").append(result).append("\n\n");
-            return result;
-        }
-    }
 }

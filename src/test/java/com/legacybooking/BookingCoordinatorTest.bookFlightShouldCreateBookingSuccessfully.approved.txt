@@ -12,7 +12,7 @@
   🔹 Returns: 11A,11B
 
 🎲 nextInt:
-  🔸 bound: 5
+  🔸 arg0: 5
   🔹 Returns: 3
 
 📣 PartnerNotifier constructor called with:
