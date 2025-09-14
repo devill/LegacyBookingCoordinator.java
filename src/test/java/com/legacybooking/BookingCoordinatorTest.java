@@ -1,16 +1,12 @@
 package com.legacybooking;
 
 import link.specrec.ObjectFactory;
-import link.specrec.IConstructorCalledWith;
-import link.specrec.ConstructorParameterInfo;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
