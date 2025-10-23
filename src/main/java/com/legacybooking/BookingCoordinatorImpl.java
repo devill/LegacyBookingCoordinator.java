@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static link.specrec.GlobalObjectFactory.*;
+import static link.specrec.objectfactory.GlobalObjectFactory.*;
 
 /**
  * Main coordinator for flight booking operations

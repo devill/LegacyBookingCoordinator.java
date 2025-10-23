@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static link.specrec.GlobalObjectFactory.*;
+import static link.specrec.objectfactory.GlobalObjectFactory.*;
 
 /**
  * Handles all pricing calculations for flight bookings
