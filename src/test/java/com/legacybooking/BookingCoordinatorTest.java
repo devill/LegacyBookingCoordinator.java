@@ -1,6 +1,6 @@
 package com.legacybooking;
 
-import link.specrec.ObjectFactory;
+import link.specrec.objectfactory.ObjectFactory;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Test;
 
